@@ -10,20 +10,14 @@ import os
 
 pm25_data = pd.read_csv('NYC EH Data Portal - Fine particles (PM 2.5) (full table) (1).csv')
 asthma_data = pd.read_csv('NYC EH Data Portal - Adults with asthma (full table).csv')
-
-#Preprocess data
 common_geoids = set(asthma_data['GeoID']).intersection(set(pm25_data['GeoID']))
 combined_data = pd.merge(asthma_data, pm25_data, on='GeoID', how='inner')
-
-# Remove special characters and convert to numeric
 asthma_data['Age-adjusted percent'] = asthma_data['Age-adjusted percent'].str.extract(r'([\d.]+)').astype(float)
 asthma_data['Number'] = asthma_data['Number'].str.replace(',', '').str.replace(r'\*', '', regex=True).astype(float)
 asthma_data['Percent'] = asthma_data['Percent'].str.extract(r'([\d.]+)').astype(float)
 
-# Convert TimePeriod to numeric (extract year if applicable)
 pm25_data['TimePeriod'] = pm25_data['TimePeriod'].str.extract(r'(\d{4})').astype(int)
 
-# Fill missing values with the mean
 combined_data['10th percentile mcg/m3'].fillna(combined_data['10th percentile mcg/m3'].mean(), inplace=True)
 combined_data['90th percentile mcg/m3'].fillna(combined_data['90th percentile mcg/m3'].mean(), inplace=True)
 
@@ -58,35 +52,31 @@ def generate_static_barplot_image(data):
     return f"data:image/png;base64,{encoded_image}"
 
 def generate_second_barplot_image(data):
-    plt.figure(figsize=(10, 6))  # Increase figure size
+    plt.figure(figsize=(10, 6)) 
     sns.barplot(
         data=data,
         x='Geography_x',
         y='Age-adjusted percent',
         errorbar=None,
         palette="muted",
-        width=0.6  # Adjust bar width for spacing
+        width=0.6
     )
     plt.title("Age-adjusted Percent for High-Case Regions")
     plt.xlabel("Geography")
     plt.ylabel("Age-adjusted Percent")
-    plt.xticks(rotation=45, ha='right')  # Rotate x-axis labels
-    plt.tight_layout()  # Adjust layout
-
-    # Save the plot to a buffer
+    plt.xticks(rotation=45, ha='right') 
+    plt.tight_layout()  
     buffer = BytesIO()
     plt.savefig(buffer, format='png', bbox_inches='tight')
     buffer.seek(0)
-    # Encode image to base64
     encoded_image = base64.b64encode(buffer.read()).decode('utf-8')
     buffer.close()
 
     return f"data:image/png;base64,{encoded_image}"
 
-# Generate the second static barplot image
+
 second_barplot_src = generate_second_barplot_image(combined_data)
 
-# Generate static barplot image
 static_barplot_src = generate_static_barplot_image(combined_data)
 
 # Initialize the app
@@ -161,7 +151,7 @@ app.layout = html.Div(
                                 }
                             )
                         ],
-                        style={'marginTop': '20px'}  # Add some space above the third plot
+                        style={'marginTop': '20px'} 
                     )
                 ]
                 ),
@@ -178,11 +168,11 @@ app.layout = html.Div(
                                         'textAlign': 'left',
                                         'fontSize': '20px',
                                         'fontWeight': 'normal',
-                                        'lineHeight': '1.4',  # Reduce line height for more compact text
-                                        'textIndent': '20px',  # Slightly reduce indent for visual appeal
+                                        'lineHeight': '1.4',
+                                        'textIndent': '20px',  
                                         'marginBottom': '0',
-                                        'marginTop': '15',  # Adjust the space above
-                                        'padding': '0',  # Ensure no extra padding is applied
+                                        'marginTop': '15', 
+                                        'padding': '0',  
                                     }
                                 ),
                                 html.P(
@@ -191,11 +181,11 @@ app.layout = html.Div(
                                         'textAlign': 'left',
                                         'fontSize': '20px',
                                         'fontWeight': 'normal',
-                                        'lineHeight': '1.4',  # Reduce line height for more compact text
-                                        'textIndent': '20px',  # Slightly reduce indent for visual appeal
-                                        'marginBottom': '0',  # Reduce space below this paragraph
-                                        'marginTop': '0',  # Adjust the space above
-                                        'padding': '0',  # Ensure no extra padding is applied
+                                        'lineHeight': '1.4',
+                                        'textIndent': '20px', 
+                                        'marginBottom': '0', 
+                                        'marginTop': '0',  
+                                        'padding': '0', 
                                     }
                                 ),
                                 html.P(
@@ -204,20 +194,20 @@ app.layout = html.Div(
                                         'textAlign': 'left',
                                         'fontSize': '20px',
                                         'fontWeight': 'normal',
-                                        'lineHeight': '1.4',  # Reduce line height for more compact text
-                                        'textIndent': '20px',  # Slightly reduce indent for visual appeal
-                                        'marginBottom': '10px',  # Reduce space below this paragraph
-                                        'marginTop': '0',  # Adjust the space above
-                                        'padding': '0',  # Ensure no extra padding is applied
+                                        'lineHeight': '1.4', 
+                                        'textIndent': '20px',  
+                                        'marginBottom': '10px',
+                                        'marginTop': '0',
+                                        'padding': '0', 
                                     }
                                 ),
                             ],
                             style={
                                 'display': 'flex',
                                 'flexDirection': 'column',
-                                'gap': '10px',  # Space between paragraphs controlled by 'gap'
+                                'gap': '10px', 
                                 'justifyContent': 'center',
-                                'alignItems': 'flex-start',  # Left align the paragraphs
+                                'alignItems': 'flex-start', 
                             }
                         ),
                         # Row for the heatmap and bar chart
@@ -229,19 +219,19 @@ app.layout = html.Div(
                                         html.Img(
                                             src=static_barplot_src,
                                             style={
-                                                'width': 'auto',  # Adjust the width as needed
-                                                'height': 'auto',  # Keep the aspect ratio intact
+                                                'width': 'auto', 
+                                                'height': 'auto',
                                                 'display': 'block',
-                                                'maxWidth': '80%',  # Ensure the heatmap is block-level
-                                                'margin': '0 auto'  # Center the heatmap horizontally
+                                                'maxWidth': '80%', 
+                                                'margin': '0 auto'
                                             }
                                         ),
                                     ],
                                     style={
                                         'display': 'flex',
-                                        'justifyContent': 'center',  # Center the heatmap
+                                        'justifyContent': 'center',
                                         'alignItems': 'center',
-                                        'marginBottom': '20px'  # Add space below the heatmap
+                                        'marginBottom': '20px' 
                                     }
                                 ),
                                 # Bar chart image
@@ -250,16 +240,16 @@ app.layout = html.Div(
                                         html.Img(
                                             src=second_barplot_src,
                                             style={
-                                                'width': 'auto',  # Adjust the width as needed
-                                                'height': 'auto',  # Keep the aspect ratio intact
-                                                'display': 'block',  # Ensure the bar graph is block-level
-                                                'margin': '0 auto'  # Center the bar graph horizontally
+                                                'width': 'auto',
+                                                'height': 'auto',  
+                                                'display': 'block',
+                                                'margin': '0 auto' 
                                             }
                                         ),
                                     ],
                                     style={
                                         'display': 'flex',
-                                        'justifyContent': 'center',  # Center the bar chart
+                                        'justifyContent': 'center', 
                                         'alignItems': 'center',
                                     }
                                 ),
@@ -285,16 +275,14 @@ app.layout = html.Div(
         Output('scatterplot', 'figure'),
         Output('scatterplot-mean-vs-number', 'figure')
     ],
-    Input('dropdown-selection', 'value')  # Use dropdown selection as the input
+    Input('dropdown-selection', 'value') 
 )
 def update_graphs(selected_geographies):
-    # Filter data based on dropdown selection
     if not selected_geographies or 'ALL' in selected_geographies:
-        filtered_data = df  # Use all data if "Select All" or no selection
+        filtered_data = df  
     else:
         filtered_data = df[df['Geography_x'].isin(selected_geographies)]
 
-    # Create the barplot
     barplot_fig = px.bar(
         filtered_data,
         x='Geography_x',
@@ -304,7 +292,6 @@ def update_graphs(selected_geographies):
     )
     barplot_fig.update_layout(xaxis_tickangle=45)
 
-    # Create the first scatterplot
     scatterplot_fig = px.scatter(
         filtered_data,
         x='Geography_x',
@@ -320,7 +307,6 @@ def update_graphs(selected_geographies):
         legend_title="Geography"
     )
 
-    # Create the second scatterplot
     scatterplot_mean_vs_number = px.scatter(
         filtered_data,
         x='Mean mcg/m3',
