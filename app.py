@@ -337,5 +337,7 @@ def update_graphs(selected_geographies):
 
     return barplot_fig, scatterplot_fig, scatterplot_mean_vs_number
 
+server = app.server
+
 if __name__ == '__main__':
     app.run_server(debug=True)
