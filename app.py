@@ -6,6 +6,9 @@ import matplotlib.pyplot as plt
 import seaborn as sns
 from io import BytesIO
 import base64
+import os
+
+port = int(os.environ.get("PORT", 8050))
 
 pm25_data = pd.read_csv('NYC EH Data Portal - Fine particles (PM 2.5) (full table) (1).csv')
 asthma_data = pd.read_csv('NYC EH Data Portal - Adults with asthma (full table).csv')
@@ -337,4 +340,4 @@ def update_graphs(selected_geographies):
     return barplot_fig, scatterplot_fig, scatterplot_mean_vs_number
 
 if __name__ == '__main__':
-    app.run(debug=True)
+    app.run_server(debug=True, host="0.0.0.0", port=port)
