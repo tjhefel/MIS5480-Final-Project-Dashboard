@@ -63,7 +63,7 @@ def generate_second_barplot_image(data):
         data=data,
         x='Geography_x',
         y='Age-adjusted percent',
-        ci=None,
+        errorbar=None,
         palette="muted",
         width=0.6  # Adjust bar width for spacing
     )
